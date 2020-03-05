@@ -70,16 +70,19 @@ class BengaliStemmer:
             is_chord_needed = True
         
         if is_chord_needed == True: 
-            if word[1] == BengaliLetter.bn_E:
-                word = word.replace(BengaliLetter.bn_E, BengaliLetter.bn_AA, 1)
-            if word[1] == BengaliLetter.bn_I:
-                word = word.replace(BengaliLetter.bn_I, BengaliLetter.bn_E, 1)
-            if word[1] == BengaliLetter.bn_U:
-                word = word.replace(BengaliLetter.bn_U, BengaliLetter.bn_O, 1)
+            if len(word) > 1:
+                if word[1] == BengaliLetter.bn_E:
+                    word = word.replace(BengaliLetter.bn_E, BengaliLetter.bn_AA, 1)
+                if word[1] == BengaliLetter.bn_I:
+                    word = word.replace(BengaliLetter.bn_I, BengaliLetter.bn_E, 1)
+                if word[1] == BengaliLetter.bn_U:
+                    word = word.replace(BengaliLetter.bn_U, BengaliLetter.bn_O, 1)
             word = word + BengaliLetter.bn_o + BengaliLetter.bn_y + BengaliLetter.bn_AA
         return word
     
     def findStemOfVerb(self, word):
+        if len(word) < 3:
+            return word
         afterFirstRule = self.applyFirstRuleOfVerb(word)
         afterSecondRule = self.applySecondRuleOfVerb(afterFirstRule)
         afterThirdRule = self.applyThirdRuleOfVerb(afterSecondRule)
@@ -120,5 +123,10 @@ class BengaliStemmer:
         afterThirdRule = self.applyThirdRuleOfNoun(afterSecondRule)
         root = self.applyFourthRuleOfNoun(afterThirdRule)
         return root
+    
+    def findStem(self, word):
+        noun_root = self.findStemOfNoun(word)
+        verb_root = self.findStemOfVerb(noun_root)
+        return verb_root
         
             
