@@ -1,4 +1,7 @@
 from bn_letters import BengaliLetter
+def rreplace(s, old, new, occurrence):
+    li = s.rsplit(old, occurrence)
+    return new.join(li)
 first_rule_of_verb = [BengaliLetter.bn_i, BengaliLetter.bn_chh, 
                       BengaliLetter.bn_t, BengaliLetter.bn_b,
                       BengaliLetter.bn_l, BengaliLetter.bn_dn,
@@ -17,6 +20,10 @@ diacritic_marks = [BengaliLetter.bn_AA, BengaliLetter.bn_I,
                    BengaliLetter.bn_O, BengaliLetter.bn_AI,
                    BengaliLetter.bn_AU, BengaliLetter.bn_U,
                    BengaliLetter.bn_UU]
+
+def len_without_diacritic_marks(word):
+    word_without_diacritic_marks = [c for c in word if c not in diacritic_marks]
+    return len(word_without_diacritic_marks)
 third_rule_of_verb = [BengaliLetter.bn_chh + BengaliLetter.bn_I,
                       BengaliLetter.bn_chh + BengaliLetter.bn_E]
 
@@ -29,7 +36,8 @@ third_rule_of_noun = [BengaliLetter.bn_d + BengaliLetter.bn_E,
                       BengaliLetter.bn_k + BengaliLetter.bn_E, 
                       BengaliLetter.bn_k + BengaliLetter.bn_AA,
                       BengaliLetter.bn_tt + BengaliLetter.bn_AA,
-                      BengaliLetter.bn_tt + BengaliLetter.bn_I]
+                      BengaliLetter.bn_tt + BengaliLetter.bn_I,
+                      BengaliLetter.bn_E]
 fourth_rule_of_noun = [BengaliLetter.bn_j + BengaliLetter.bn_dn,
                        BengaliLetter.bn_g + BengaliLetter.bn_U + BengaliLetter.bn_l + BengaliLetter.bn_O,
                        BengaliLetter.bn_g + BengaliLetter.bn_U + BengaliLetter.bn_l + BengaliLetter.bn_I,
@@ -69,14 +77,14 @@ class BengaliStemmer:
             word = word[:-2]
             is_chord_needed = True
         
-        if is_chord_needed == True: 
-            if len(word) > 1:
-                if word[1] == BengaliLetter.bn_E:
-                    word = word.replace(BengaliLetter.bn_E, BengaliLetter.bn_AA, 1)
-                if word[1] == BengaliLetter.bn_I:
-                    word = word.replace(BengaliLetter.bn_I, BengaliLetter.bn_E, 1)
-                if word[1] == BengaliLetter.bn_U:
-                    word = word.replace(BengaliLetter.bn_U, BengaliLetter.bn_O, 1)
+        if is_chord_needed == True and len(word) == 2: 
+            #if len(word) > 1:
+            if word[1] == BengaliLetter.bn_E:
+                word = word.replace(BengaliLetter.bn_E, BengaliLetter.bn_AA, 1)
+            if word[1] == BengaliLetter.bn_I:
+                word = word.replace(BengaliLetter.bn_I, BengaliLetter.bn_E, 1)
+            if word[1] == BengaliLetter.bn_U:
+                word = word.replace(BengaliLetter.bn_U, BengaliLetter.bn_O, 1)
             word = word + BengaliLetter.bn_o + BengaliLetter.bn_y + BengaliLetter.bn_AA
         return word
     
@@ -92,28 +100,28 @@ class BengaliStemmer:
     def applyFirstRuleOfNoun(self, word):
         for inflection in first_rule_of_noun:
             if word.endswith(inflection):
-                word = word.replace(inflection, "")
+                word = rreplace(word, inflection, "", 1)
                 break
         return word
     
     def applySecondRuleOfNoun(self, word):
         for inflection in second_rule_of_noun:
             if word.endswith(inflection):
-                word = word.replace(inflection, "")
+                word = rreplace(word, inflection, "", 1)
                 break
         return word
     
     def applyThirdRuleOfNoun(self, word):
         for inflection in third_rule_of_noun:
             if word.endswith(inflection):
-                word = word.replace(inflection, "")
+                word = rreplace(word, inflection, "", 1)
                 break
         return word
     
     def applyFourthRuleOfNoun(self, word):
         for inflection in fourth_rule_of_noun:
             if word.endswith(inflection):
-                word = word.replace(inflection, "")
+                word = rreplace(word, inflection, "", 1)
                 break
         return word
     
@@ -126,7 +134,15 @@ class BengaliStemmer:
     
     def findStem(self, word):
         noun_root = self.findStemOfNoun(word)
-        verb_root = self.findStemOfVerb(noun_root)
-        return verb_root
+        
+        if len(noun_root) < len(word):
+            return noun_root
+        
+        verb_root = self.findStemOfVerb(word)
+        
+        if len_without_diacritic_marks(verb_root) <= 3:
+            return verb_root
+        else:
+            return noun_root
         
             

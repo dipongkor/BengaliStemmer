@@ -27,6 +27,8 @@ class TestBengaliStemmer(unittest.TestCase):
         afterThirdRule = stemmer.applyThirdRuleOfVerb(afterSecondRule)
         afterFourthRule = stemmer.applyFourthRuleOfVerb(afterThirdRule)
         self.assertEqual(afterFourthRule, "কর")
+        root = stemmer.findStemOfVerb("করছে")
+        self.assertEqual(root, "কর")
     
     def test_verb_chord(self):
         stemmer = BengaliStemmer()
@@ -55,11 +57,17 @@ class TestBengaliStemmer(unittest.TestCase):
         self.assertEqual(root, "মানুষ")
         root = stemmer.findStem("নিয়েছিলাম")
         self.assertEqual(root, "নেওয়া")
-        #root = stemmer.findStem("বিবদমান")
-        #self.assertEqual(root, "বিবদমান")
+        root = stemmer.findStem("বিবদমান")
+        self.assertEqual(root, "বিবদমান")
     
     def test_ex(self):
         stemmer = BengaliStemmer()
-        root = stemmer.findStemOfVerb("রয়েছেন")    
+        #root = stemmer.findStemOfVerb("রয়েছেন")
+        root = stemmer.findStem("পাপিয়ার")
+        self.assertEqual(root, "পাপিয়া")   
+        root = stemmer.findStemOfNoun("পাপিয়া")
+        self.assertEqual(root, "পাপিয়া")
+        root = stemmer.findStemOfNoun("ছাত্রলীগের")
+        self.assertEqual(root, "ছাত্রলীগ") 
 if __name__ == '__main__':
     unittest.main()
