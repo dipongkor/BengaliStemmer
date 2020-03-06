@@ -46,6 +46,8 @@ fourth_rule_of_noun = [BengaliLetter.bn_j + BengaliLetter.bn_dn,
 class BengaliStemmer:
     
     def applyFirstRuleOfVerb(self, word):
+        if len(word) <= 1:
+            return word
         if word[-1] in first_rule_of_verb:
             word = word[0:-1]
         return word
@@ -78,7 +80,6 @@ class BengaliStemmer:
             is_chord_needed = True
         
         if is_chord_needed == True and len(word) == 2: 
-            #if len(word) > 1:
             if word[1] == BengaliLetter.bn_E:
                 word = word.replace(BengaliLetter.bn_E, BengaliLetter.bn_AA, 1)
             if word[1] == BengaliLetter.bn_I:
